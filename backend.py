@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from websocket import create_connection
 import json
 from time import sleep
-# import firebase_admin
-# from firebase_admin import credentials, db
+import firebase_admin
+from firebase_admin import credentials, db
 
 load_dotenv()
 
@@ -12,12 +12,12 @@ clientId = os.getenv("clientId")
 clientSecret = os.getenv("clientSecret")
 print("clientId: ", clientId)
 print("clientSecret: ", clientSecret)
-# firebaseDatabaseUrl = os.getenv("firebaseDatabaseUrl")
+firebaseDatabaseUrl = os.getenv("firebaseDatabaseUrl")
 
 # # database connection
-# cred = credentials.Certificate("credentials.json")
-# firebase_admin.initialize_app(cred, {"databaseURL": firebaseDatabaseUrl})
-# ref = db.reference("/")
+cred = credentials.Certificate("credentials.json")
+firebase_admin.initialize_app(cred, {"databaseURL": firebaseDatabaseUrl})
+ref = db.reference("/")
 
 # websocket connection
 ws = create_connection("wss://localhost:6868")
@@ -120,26 +120,32 @@ while True:
     result = json.loads(result)
 
     
-    if "com" in result and prev_action != "com":
+    if "com" in result:
         action = result["com"][0]
         power = result["com"][1]
 
         if action == "left" and power >= 0.6:
             flag = True
             prev_action = "com"
-            # db.reference("/left").set({"enabled": True})
+            db.reference("/left").set({"enabled": True})
+            db.reference("/right").set({"enabled": False})
+            db.reference("/neutral").set({"enabled": False})
             print("Received ", result)
 
         elif action == "right" and power >= 0.6:
             flag = True
             prev_action = "com"
-            # db.reference("/right").set({"enabled": True})
+            db.reference("/right").set({"enabled": True})
+            db.reference("/neutral").set({"enabled": False})
+            db.reference("/left").set({"enabled": False})
             print("Received ", result)
 
         elif action == "neutral" and power >= 0.6:
             flag = True
             prev_action = "com"
-            # db.reference("/neutral").set({"enabled": True})
+            db.reference("/neutral").set({"enabled": True})
+            db.reference("/left").set({"enabled": False})
+            db.reference("/right").set({"enabled": False})
             print("Received ", result)
             
     if flag == True:
@@ -147,4 +153,4 @@ while True:
         flag = False
 
 
-# ws.close
+ws.close
