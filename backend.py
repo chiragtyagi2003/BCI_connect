@@ -124,7 +124,7 @@ while True:
         action = result["com"][0]
         power = result["com"][1]
 
-        if action == "left" and power >= 0.6:
+        if action == "left" and power >= 0.5:
             flag = True
             prev_action = "com"
             db.reference("/left").set({"enabled": True})
@@ -132,7 +132,7 @@ while True:
             db.reference("/neutral").set({"enabled": False})
             print("Received ", result)
 
-        elif action == "right" and power >= 0.6:
+        elif action == "right" and power >= 0.5:
             flag = True
             prev_action = "com"
             db.reference("/right").set({"enabled": True})
@@ -140,7 +140,7 @@ while True:
             db.reference("/left").set({"enabled": False})
             print("Received ", result)
 
-        elif action == "neutral" and power >= 0.6:
+        elif action == "neutral" and power >= 0.5:
             flag = True
             prev_action = "com"
             db.reference("/neutral").set({"enabled": True})
